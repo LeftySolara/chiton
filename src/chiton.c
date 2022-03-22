@@ -1,7 +1,7 @@
 /**
  * @file chiton.c
  * @author Julianne Adams <julianne@julianneadams.info>
- * @brief The entry point for the program.
+ * @brief A simple UNIX shell
  * @version 0.1
  * @date 2021-06-30
  *
