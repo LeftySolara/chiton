@@ -1,6 +1,6 @@
 /**
  * @file chiton.c
- * @author Jalen Adams <jalen@jalenkadams.me>
+ * @author Julianne Adams <julianne@julianneadams.info>
  * @brief The entry point for the program.
  * @version 0.1
  * @date 2021-06-30
