@@ -49,7 +49,7 @@ char *chiton_read_line()
  * @param line The line to split.
  * @return A list of tokens extracted from the line.
  */
-char **chiton_split_line(char *line)
+char **chiton_tokenize(char *line)
 {
     int bufsize = CHITON_TOK_BUFSIZE;
     int position = 0;
