@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "error.h"
@@ -85,6 +86,39 @@ char **chiton_tokenize(char *line)
 }
 
 /**
+ * @brief Launches a new process
+ *
+ * @param args The arguments to pass to the new process
+ * @return int The error code for the result of the process launch
+ */
+int launch_process(char **args)
+{
+    pid_t pid, wpid;
+    int status;
+
+    pid = fork();
+    char *env[] = {(char *)0};
+
+    if (pid == 0) {
+        if (execve(args[0], args, env) == -1) {
+            perror(args[0]);
+        }
+        return CHITON_ERROR_GENERAL;
+    }
+    else if (pid < 0) {
+        perror("chiton");
+        return CHITON_ERROR_GENERAL;
+    }
+    else {
+        do {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
+
+    return CHITON_ERROR_SUCCESS;
+}
+
+/**
  * @brief Create a prompt in the format username@hostname>
  *
  * @param buffer A malloc-allocated buffer for storing the prompt string
@@ -134,14 +168,22 @@ void print_prompt(const char *prompt, int status)
 
 int main(int argc, char **argv)
 {
+    char *line;
+    char **args;
     int status = CHITON_ERROR_SUCCESS;
     char *prompt = NULL;
 
     prompt = create_prompt(prompt);
-    print_prompt(prompt, status);
+    do {
+        print_prompt(prompt, status);
+        line = chiton_read_line();
+        args = chiton_tokenize(line);
+        launch_process(args);
+    } while (status != CHITON_ERROR_EXIT);
 
-    char *line;
-    line = chiton_read_line();
+    free(line);
+    free(args);
+    free(prompt);
 
     return 0;
 }
