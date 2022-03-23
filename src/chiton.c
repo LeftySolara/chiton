@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "error.h"
+
 #define CHITON_TOK_BUFSIZE 64
 #define CHITON_TOK_DELIM " \t\r\n\a"
 
@@ -30,11 +32,11 @@ char *chiton_read_line()
     if (getline(&line, &bufsize, stdin) == -1) {
         if (feof_unlocked(stdin)) {
             /* We've received EOF. */
-            exit(EXIT_SUCCESS);
+            exit(CHITON_ERROR_SUCCESS);
         }
         else {
             perror("readline");
-            exit(EXIT_FAILURE);
+            exit(CHITON_ERROR_GENERAL);
         }
     }
 
@@ -51,12 +53,12 @@ char **chiton_split_line(char *line)
 {
     int bufsize = CHITON_TOK_BUFSIZE;
     int position = 0;
-    char **tokens = malloc(bufsize * sizeof(char *));
     char *token;
+    char **tokens = malloc(bufsize * sizeof(char *));
 
     if (!tokens) {
         fprintf(stderr, "chiton: allocation error\n");
-        exit(EXIT_FAILURE);
+        exit(CHITON_ERROR_GENERAL);
     }
 
     token = strtok(line, CHITON_TOK_DELIM);
@@ -69,7 +71,7 @@ char **chiton_split_line(char *line)
             tokens = realloc(tokens, bufsize * sizeof(char *));
             if (!tokens) {
                 fprintf(stderr, "chiton: allocation error\n");
-                exit(EXIT_FAILURE);
+                exit(CHITON_ERROR_GENERAL);
             }
         }
         token = strtok(NULL, CHITON_TOK_DELIM);
