@@ -9,10 +9,13 @@
  *
  */
 
+#include <bits/posix1_lim.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "error.h"
 
@@ -81,11 +84,63 @@ char **chiton_tokenize(char *line)
     return tokens;
 }
 
+/**
+ * @brief Create a prompt in the format username@hostname>
+ *
+ * @param buffer A malloc-allocated buffer for storing the prompt string
+ * @return char* The buffer with the new prompt written to it
+ */
+char *create_prompt(char *buffer)
+{
+    char *username = malloc(sizeof(char) * _POSIX_LOGIN_NAME_MAX);
+    char *hostname = malloc(sizeof(char) * _POSIX_HOST_NAME_MAX);
+
+    if (getlogin_r(username, sizeof(char) * _POSIX_LOGIN_NAME_MAX) != 0) {
+        fprintf(stderr, "chiton: error fetching username\n");
+        exit(CHITON_ERROR_GENERAL);
+    }
+    if (gethostname(hostname, sizeof(char) * _POSIX_HOST_NAME_MAX) != 0) {
+        fprintf(stderr, "chiton: error fetching hostname\n");
+        exit(CHITON_ERROR_GENERAL);
+    }
+
+    int prompt_len = strlen(username) + strlen(hostname) + 1;
+    buffer = realloc(buffer, sizeof(char) * prompt_len);
+
+    strcpy(buffer, username);
+    strcat(buffer, "@");
+    strcat(buffer, hostname);
+    strcat(buffer, ">");
+
+    free(username);
+    free(hostname);
+
+    return buffer;
+}
+
+/**
+ * @brief Prints the user's prompt
+ *
+ * @param prompt A string containing the prompt text
+ * @param status The exit code of the last command
+ */
+void print_prompt(const char *prompt, int status)
+{
+    if (status != CHITON_ERROR_SUCCESS) {
+        printf("[%d] ", status);
+    }
+    printf("%s ", prompt);
+}
+
 int main(int argc, char **argv)
 {
-    char *line;
+    int status = CHITON_ERROR_SUCCESS;
+    char *prompt = NULL;
 
-    printf("> ");
+    prompt = create_prompt(prompt);
+    print_prompt(prompt, status);
+
+    char *line;
     line = chiton_read_line();
 
     return 0;
