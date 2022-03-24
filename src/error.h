@@ -8,6 +8,9 @@
  *
  */
 
+#ifndef ERROR_H
+#define ERROR_H
+
 /* Condition for breaking main program loop */
 #define CHITON_ERROR_EXIT -1
 
@@ -43,3 +46,5 @@
 
 /* Exit status out of range */
 #define CHITON_ERROR_STATUS_RANGE 255
+
+#endif /* ERROR_H */
