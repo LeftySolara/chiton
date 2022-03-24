@@ -98,10 +98,9 @@ int launch_process(char **args)
     int status;
 
     pid = fork();
-    char *env[] = {(char *)0};
 
     if (pid == 0) {
-        if (execve(args[0], args, env) == -1) {
+        if (execvp(args[0], args) == -1) {
             perror(args[0]);
         }
         return CHITON_ERROR_EXIT;
