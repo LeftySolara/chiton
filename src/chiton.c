@@ -18,6 +18,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "builtins.h"
 #include "error.h"
 
 #define CHITON_TOK_BUFSIZE 64
@@ -103,7 +104,7 @@ int launch_process(char **args)
         if (execve(args[0], args, env) == -1) {
             perror(args[0]);
         }
-        return CHITON_ERROR_GENERAL;
+        return CHITON_ERROR_EXIT;
     }
     else if (pid < 0) {
         perror("chiton");
@@ -116,6 +117,29 @@ int launch_process(char **args)
     }
 
     return CHITON_ERROR_SUCCESS;
+}
+
+/**
+ * @brief Executes a built-in command. If a built-in is not found, launches a new process.
+ *
+ * @param args Arguments to pass to the command/program.
+ * @return int The return code of the command or program that was run
+ */
+int chiton_execute(char **args)
+{
+    /* An empty command was entered */
+    if (args[0] == NULL) {
+        return CHITON_ERROR_SUCCESS;
+    }
+
+    int num_builtins = chiton_num_builtins();
+    for (int i = 0; i < num_builtins; ++i) {
+        if (strcmp(args[0], builtin_str[i]) == 0) {
+            return (*builtin_func[i])(args);
+        }
+    }
+
+    return launch_process(args);
 }
 
 /**
@@ -178,11 +202,12 @@ int main(int argc, char **argv)
         print_prompt(prompt, status);
         line = chiton_read_line();
         args = chiton_tokenize(line);
-        launch_process(args);
+        status = chiton_execute(args);
+
+        free(line);
+        free(args);
     } while (status != CHITON_ERROR_EXIT);
 
-    free(line);
-    free(args);
     free(prompt);
 
     return 0;
