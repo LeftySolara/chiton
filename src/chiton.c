@@ -115,7 +115,7 @@ int launch_process(char **args)
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
 
-    return CHITON_ERROR_SUCCESS;
+    return status;
 }
 
 /**
@@ -184,9 +184,11 @@ char *create_prompt(char *buffer)
 void print_prompt(const char *prompt, int status)
 {
     if (status != CHITON_ERROR_SUCCESS) {
+        printf("\033[1;31m");
         printf("[%d] ", status);
     }
     printf("%s ", prompt);
+    printf("\033[0m");
 }
 
 int main(int argc, char **argv)
