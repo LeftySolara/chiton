@@ -52,7 +52,33 @@ enum char_type {
 
 extern char *token_type_str[];
 
+/**
+ * @brief An input token with text and a category
+ */
 struct token {
-    char *text;
-    token_type type;
+    char *text;           /** The original text of the token */
+    enum token_type type; /** The token type */
 };
+
+/**
+ * @brief A node in a linked list containing a token.
+ */
+struct node {
+    struct token *token; /** The token contained in this node */
+    struct node *next;   /** A pointer to the next node in the list */
+};
+
+struct token_list {
+    struct node *head; /** The first node in the list */
+};
+
+struct token *token_create(char *text, enum token_type type);
+void token_free(struct token *token);
+
+struct node *node_create(struct token *token);
+void node_free(struct node *node);
+
+struct token_list *token_list_create();
+void token_list_free(struct token_list *list);
+
+struct token_list *tokenize(const char *src);
