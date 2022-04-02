@@ -11,7 +11,18 @@
 
 #include <stdio.h>
 
-enum state { STATE_GENERAL, STATE_IN_WORD, STATE_IN_OPERATOR, STATE_EOF };
+enum state {
+    STATE_GENERAL,
+    STATE_IN_WORD,
+    STATE_IN_OPERATOR_AMPERSAND,
+    STATE_IN_OPERATOR_PIPE,
+    STATE_IN_OPERATOR_SEMI,
+    STATE_IN_OPERATOR_LESS,
+    STATE_IN_OPERATOR_GREAT,
+    STATE_IN_OPERATOR_DASH,
+    STATE_EOF,
+    STATE_ERROR
+};
 
 enum token_type {
     TOKEN_TOKEN,
@@ -72,6 +83,11 @@ struct token_list {
     struct node *head; /** The first node in the list */
 };
 
+struct branch {
+    enum state const next_state;
+    void (*action)(struct token_list *list, const char *);
+};
+
 struct token *token_create(char *text, enum token_type type);
 void token_free(struct token *token);
 
@@ -80,5 +96,8 @@ void node_free(struct node *node);
 
 struct token_list *token_list_create();
 void token_list_free(struct token_list *list);
+
+void delimit(struct token_list *list, const char *str);
+void nop(struct token_list *list, const char *str);
 
 struct token_list *tokenize(const char *src);

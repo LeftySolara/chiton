@@ -19,6 +19,22 @@ char *token_type_str[] = {
 };
 
 /**
+ * @brief FSM transitions
+ */
+struct branch const transitions[9][9] = {
+    //       EOF                                '&'                                   '|'                                 ';'                                '<'                                   '>'                                 '-'                             letter                    digit                  States/Inputs
+    {{STATE_GENERAL,     &nop}, {STATE_IN_OPERATOR_AMPERSAND,     &nop}, {STATE_IN_OPERATOR_PIPE,     &nop}, {STATE_IN_OPERATOR_SEMI,     &nop}, {STATE_IN_OPERATOR_LESS,     &nop}, {STATE_IN_OPERATOR_GREAT,     &nop}, {STATE_IN_OPERATOR_DASH,     &nop}, {STATE_IN_WORD,     &nop}, {STATE_IN_WORD,     &nop}},    // GENERAL
+    {{STATE_GENERAL, &delimit}, {STATE_IN_OPERATOR_AMPERSAND, &delimit}, {STATE_IN_OPERATOR_PIPE, &delimit}, {STATE_IN_OPERATOR_SEMI, &delimit}, {STATE_IN_OPERATOR_LESS, &delimit}, {STATE_IN_OPERATOR_GREAT, &delimit}, {STATE_IN_OPERATOR_DASH, &delimit}, {STATE_IN_WORD,     &nop}, {STATE_IN_WORD,     &nop}},    // IN_WORD
+    {{STATE_GENERAL, &delimit}, {STATE_IN_OPERATOR_AMPERSAND,     &nop}, {STATE_IN_OPERATOR_PIPE,     &nop}, {STATE_IN_OPERATOR_SEMI, &delimit}, {STATE_IN_OPERATOR_LESS, &delimit}, {STATE_IN_OPERATOR_GREAT, &delimit}, {STATE_IN_OPERATOR_DASH, &delimit}, {STATE_IN_WORD, &delimit}, {STATE_IN_WORD, &delimit}},    // IN_OPERATOR_AMPERSAND
+    {{STATE_GENERAL, &delimit}, {STATE_IN_OPERATOR_AMPERSAND, &delimit}, {STATE_IN_OPERATOR_PIPE,     &nop}, {STATE_IN_OPERATOR_SEMI, &delimit}, {STATE_IN_OPERATOR_LESS, &delimit}, {STATE_IN_OPERATOR_GREAT, &delimit}, {STATE_IN_OPERATOR_DASH, &delimit}, {STATE_IN_WORD, &delimit}, {STATE_IN_WORD, &delimit}},    // IN_OPERATOR_PIPE
+    {{STATE_GENERAL, &delimit}, {STATE_IN_OPERATOR_AMPERSAND, &delimit}, {STATE_IN_OPERATOR_PIPE, &delimit}, {STATE_IN_OPERATOR_SEMI,     &nop}, {STATE_IN_OPERATOR_LESS, &delimit}, {STATE_IN_OPERATOR_GREAT, &delimit}, {STATE_IN_OPERATOR_DASH, &delimit}, {STATE_IN_WORD, &delimit}, {STATE_IN_WORD, &delimit}},    // IN_OPERATOR_SEMI
+    {{STATE_GENERAL, &delimit}, {STATE_IN_OPERATOR_AMPERSAND,     &nop}, {STATE_IN_OPERATOR_PIPE, &delimit}, {STATE_IN_OPERATOR_SEMI, &delimit}, {STATE_IN_OPERATOR_LESS,     &nop}, {STATE_IN_OPERATOR_GREAT,     &nop}, {STATE_IN_OPERATOR_DASH,     &nop}, {STATE_IN_WORD, &delimit}, {STATE_IN_WORD, &delimit}},    // IN_OPERATOR_LESS  
+    {{STATE_GENERAL, &delimit}, {STATE_IN_OPERATOR_AMPERSAND,     &nop}, {STATE_IN_OPERATOR_PIPE,     &nop}, {STATE_IN_OPERATOR_SEMI, &delimit}, {STATE_IN_OPERATOR_LESS, &delimit}, {STATE_IN_OPERATOR_GREAT,     &nop}, {STATE_IN_OPERATOR_DASH, &delimit}, {STATE_IN_WORD, &delimit}, {STATE_IN_WORD, &delimit}},    // IN_OPERATOR_GREAT
+    {{STATE_GENERAL, &delimit}, {STATE_IN_OPERATOR_AMPERSAND, &delimit}, {STATE_IN_OPERATOR_PIPE, &delimit}, {STATE_IN_OPERATOR_SEMI, &delimit}, {STATE_IN_OPERATOR_LESS, &delimit}, {STATE_IN_OPERATOR_GREAT, &delimit}, {STATE_IN_OPERATOR_DASH,     &nop}, {STATE_IN_WORD, &delimit}, {STATE_IN_WORD, &delimit}},    // IN_OPERATOR_DASH
+    {{STATE_GENERAL,     &nop}, {STATE_IN_OPERATOR_AMPERSAND,     &nop}, {STATE_IN_OPERATOR_PIPE,     &nop}, {STATE_IN_OPERATOR_SEMI,     &nop}, {STATE_IN_OPERATOR_LESS,     &nop}, {STATE_IN_OPERATOR_GREAT,     &nop}, {STATE_IN_OPERATOR_DASH,     &nop}, {STATE_IN_WORD,     &nop}, {STATE_IN_WORD,     &nop}}     // EOF
+};
+
+/**
  * @brief Create a new token with the given text and type
  *
  * @param text The token's text representation
@@ -108,6 +124,11 @@ void token_list_free(struct token_list *list)
     free(list);
 }
 
+/* TODO: implement */
+void delimit(struct token_list *list, const char *str) {}
+
+void nop(struct token_list *list, const char *str) {}
+
 /**
  * @brief Split an input string into tokens
  *
@@ -116,6 +137,9 @@ void token_list_free(struct token_list *list)
  */
 struct token_list *tokenize(const char *src)
 {
-    /*TODO: Implement this */
+    enum state lexer_state = STATE_GENERAL;
+    while (lexer_state != STATE_EOF) {
+    }
+
     return NULL;
 }
