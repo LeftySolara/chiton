@@ -10,8 +10,11 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "lexer.h"
+
+#define CHITON_TOKEN_BUFSIZE 64
 
 char *token_type_str[] = {
     " ", " ", " ", " ", "\n", " ", "&&", "||", ";;", "<<", ">>", "<&", ">&", "<>", "<<-", ">|", " ",
@@ -135,11 +138,48 @@ void nop(struct token_list *list, const char *str) {}
  * @param src The string to split
  * @return struct token_list* A list of tokens from the src string
  */
-struct token_list *tokenize(const char *src)
+struct token_list *tokenize(char *src)
 {
+    char *token = malloc(sizeof(char) * CHITON_TOKEN_BUFSIZE);
+    memset(token, '\0', CHITON_TOKEN_BUFSIZE);
+    size_t token_length = 0;
     enum state lexer_state = STATE_GENERAL;
+
     while (lexer_state != STATE_EOF) {
+        switch(*src) {
+            case ' ':
+                printf("TOKEN %s\n", token);
+                memset(token, '\0', CHITON_TOKEN_BUFSIZE);
+                token_length = 0;
+                lexer_state = STATE_GENERAL;
+                break;
+            case '\n':
+                printf("TOKEN %s\n", token);
+                lexer_state = STATE_EOF;
+                break;
+            case '\0':
+                printf("Reached EOF\n");
+                lexer_state = STATE_EOF;
+                break;
+            case '&':
+                // printf("IN OPERATOR AMPERSAND\n");
+                token[token_length++] = *src;
+                lexer_state = STATE_IN_OPERATOR_AMPERSAND;
+                break;
+            case '|':
+                // printf("IN OPERATOR PIPE\n");
+                token[token_length++] = *src;
+                lexer_state = STATE_IN_OPERATOR_PIPE;
+                break;
+            default:
+                // printf("%c: IN WORD\n", *src);
+                token[token_length++] = *src;
+                lexer_state = STATE_IN_WORD;
+                break;
+        }
+        ++src;
     }
+    free(token);
 
     return NULL;
 }

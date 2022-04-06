@@ -20,6 +20,7 @@
 
 #include "builtins.h"
 #include "error.h"
+#include "lexer.h"
 
 #define CHITON_TOK_BUFSIZE 64
 #define CHITON_TOK_DELIM " \t\r\n\a"
@@ -194,19 +195,21 @@ void print_prompt(const char *prompt, int status)
 int main(int argc, char **argv)
 {
     char *line;
-    char **args;
-    int status = CHITON_ERROR_SUCCESS;
+    // char **args;
+    // int status = CHITON_ERROR_SUCCESS;
+    int status = CHITON_ERROR_EXIT;
     char *prompt = NULL;
 
     prompt = create_prompt(prompt);
     do {
         print_prompt(prompt, status);
         line = chiton_read_line();
-        args = chiton_tokenize(line);
-        status = chiton_execute(args);
+        tokenize(line);
+        // args = chiton_tokenize(line);
+        // status = chiton_execute(args);
 
         free(line);
-        free(args);
+        // free(args);
     } while (status != CHITON_ERROR_EXIT);
 
     free(prompt);

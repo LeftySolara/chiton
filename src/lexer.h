@@ -100,4 +100,4 @@ void token_list_free(struct token_list *list);
 void delimit(struct token_list *list, const char *str);
 void nop(struct token_list *list, const char *str);
 
-struct token_list *tokenize(const char *src);
+struct token_list *tokenize(char *src);
